@@ -5,7 +5,7 @@
 
 Name:          %{?scl_prefix}%{pkg_name}
 Version:       2.0
-Release:       6.10%{?dist}
+Release:       6.11%{?dist}
 Summary:       Maven dependency tree artifact
 License:       ASL 2.0
 Url:           http://maven.apache.org/
@@ -13,9 +13,9 @@ Source0:       http://repo1.maven.org/maven2/org/apache/maven/shared/%{pkg_name}
 BuildArch:     noarch
 
 BuildRequires: %{?scl_prefix_java_common}maven-local
-BuildRequires: maven30-maven-shared
-BuildRequires: maven30-plexus-containers-component-metadata
-BuildRequires: maven30-plexus-containers-component-annotations
+BuildRequires: %{?scl_prefix}maven-shared
+BuildRequires: %{?scl_prefix}plexus-containers-component-metadata
+BuildRequires: %{?scl_prefix}plexus-containers-component-annotations
 
 
 %description
@@ -29,21 +29,21 @@ This package contains javadoc for %{pkg_name}.
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %pom_add_dep org.apache.maven:maven-compat:3.0.4
 %pom_add_dep org.apache.maven:maven-artifact:2.2.1
 %{?scl:EOF}
 
 %build
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 # we have no jmock yet
 %mvn_build -f
 %{?scl:EOF}
 
 %install
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %mvn_install
 %{?scl:EOF}
@@ -57,6 +57,9 @@ set -e -x
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jan 11 2016 Michal Srb <msrb@redhat.com> - 2.0-6.11
+- maven33 rebuild #2
+
 * Sat Jan 09 2016 Michal Srb <msrb@redhat.com> - 2.0-6.10
 - maven33 rebuild
 
