@@ -1,0 +1,90 @@
+diff --git a/pom.xml b/pom.xml
+index 31f4600..2f149da 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -56,7 +56,7 @@
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+       <artifactId>maven-core</artifactId>
+-      <version>3.0.4</version>
++      <version>3.1.0</version>
+       <scope>provided</scope>
+     </dependency>
+     <dependency>
+@@ -65,10 +65,21 @@
+       <version>1.5.5</version>
+     </dependency>
+     <dependency>
+-      <groupId>org.sonatype.aether</groupId>
++      <groupId>org.eclipse.aether</groupId>
+       <artifactId>aether-api</artifactId>
+-      <version>1.13.1</version>
+       <optional>true</optional>
++      <version>0.9.0.M2</version>
++    </dependency>
++    <dependency>
++      <groupId>org.eclipse.aether</groupId>
++      <artifactId>aether-util</artifactId>
++      <version>0.9.0.M2</version>
++      <exclusions>
++        <exclusion>
++          <groupId>org.eclipse.aether</groupId>
++          <artifactId>aether-api</artifactId>
++        </exclusion>
++      </exclusions>
+     </dependency>
+ 
+     <dependency>
+diff --git a/src/main/java/org/apache/maven/shared/dependency/graph/internal/Maven3DependencyGraphBuilder.java b/src/main/java/org/apache/maven/shared/dependency/graph/internal/Maven3DependencyGraphBuilder.java
+index 9527f72..8b7b025 100644
+--- a/src/main/java/org/apache/maven/shared/dependency/graph/internal/Maven3DependencyGraphBuilder.java
++++ b/src/main/java/org/apache/maven/shared/dependency/graph/internal/Maven3DependencyGraphBuilder.java
+@@ -40,8 +40,8 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+ import org.apache.maven.shared.dependency.graph.DependencyNode;
+ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+-import org.sonatype.aether.graph.Dependency;
+-import org.sonatype.aether.version.VersionConstraint;
++import org.eclipse.aether.graph.Dependency;
++import org.eclipse.aether.version.VersionConstraint;
+ 
+ /**
+  * Wrapper around Maven 3 dependency resolver.
+@@ -101,7 +101,7 @@ public class Maven3DependencyGraphBuilder
+ 
+     private Artifact getDependencyArtifact( Dependency dep )
+     {
+-        org.sonatype.aether.artifact.Artifact artifact = dep.getArtifact();
++        org.eclipse.aether.artifact.Artifact artifact = dep.getArtifact();
+ 
+         return factory.createDependencyArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                  VersionRange.createFromVersion( artifact.getVersion() ),
+@@ -109,15 +109,15 @@ public class Maven3DependencyGraphBuilder
+                                                  dep.isOptional() );
+     }
+ 
+-    private DependencyNode buildDependencyNode( DependencyNode parent, org.sonatype.aether.graph.DependencyNode node,
++    private DependencyNode buildDependencyNode( DependencyNode parent, org.eclipse.aether.graph.DependencyNode node,
+                                                 Artifact artifact, ArtifactFilter filter )
+     {
+         DefaultDependencyNode current =
+-            new DefaultDependencyNode( parent, artifact, node.getPremanagedVersion(), node.getPremanagedScope(),
++            new DefaultDependencyNode( parent, artifact, null /*node.getPremanagedVersion()*/, null /*node.getPremanagedScope()*/,
+                                        getVersionSelectedFromRange( node.getVersionConstraint() ) );
+ 
+         List<DependencyNode> nodes = new ArrayList<DependencyNode>( node.getChildren().size() );
+-        for ( org.sonatype.aether.graph.DependencyNode child : node.getChildren() )
++        for ( org.eclipse.aether.graph.DependencyNode child : node.getChildren() )
+         {
+             Artifact childArtifact = getDependencyArtifact( child.getDependency() );
+ 
+@@ -140,7 +140,8 @@ public class Maven3DependencyGraphBuilder
+         }
+ 
+         StringBuilder sb = new StringBuilder();
+-        for ( org.sonatype.aether.version.VersionRange range : constraint.getRanges() )
++        org.eclipse.aether.version.VersionRange range = constraint.getRange();
++        if ( range != null )
+         {
+             if ( sb.length() > 0 )
+             {

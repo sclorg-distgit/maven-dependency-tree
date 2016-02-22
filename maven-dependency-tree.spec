@@ -5,11 +5,12 @@
 
 Name:          %{?scl_prefix}%{pkg_name}
 Version:       2.0
-Release:       6.11%{?dist}
+Release:       6.12%{?dist}
 Summary:       Maven dependency tree artifact
 License:       ASL 2.0
 Url:           http://maven.apache.org/
 Source0:       http://repo1.maven.org/maven2/org/apache/maven/shared/%{pkg_name}/%{version}/%{pkg_name}-%{version}-source-release.zip
+Patch0:        0001-Port-to-Maven-3.1.0-and-Eclipse-Aether.patch
 BuildArch:     noarch
 
 BuildRequires: %{?scl_prefix_java_common}maven-local
@@ -31,6 +32,7 @@ This package contains javadoc for %{pkg_name}.
 %setup -q -n %{pkg_name}-%{version}
 %{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
+%patch0 -p1
 %pom_add_dep org.apache.maven:maven-compat:3.0.4
 %pom_add_dep org.apache.maven:maven-artifact:2.2.1
 %{?scl:EOF}
@@ -57,6 +59,9 @@ set -e -x
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Jan 18 2016 Michal Srb <msrb@redhat.com> - 2.0-6.12
+- Remove dependency on Sonatype Aether
+
 * Mon Jan 11 2016 Michal Srb <msrb@redhat.com> - 2.0-6.11
 - maven33 rebuild #2
 
