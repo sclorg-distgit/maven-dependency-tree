@@ -5,7 +5,7 @@
 
 Name:          %{?scl_prefix}%{pkg_name}
 Version:       2.0
-Release:       6.12%{?dist}
+Release:       6.13%{?dist}
 Summary:       Maven dependency tree artifact
 License:       ASL 2.0
 Url:           http://maven.apache.org/
@@ -13,7 +13,7 @@ Source0:       http://repo1.maven.org/maven2/org/apache/maven/shared/%{pkg_name}
 Patch0:        0001-Port-to-Maven-3.1.0-and-Eclipse-Aether.patch
 BuildArch:     noarch
 
-BuildRequires: %{?scl_prefix_java_common}maven-local
+BuildRequires: %{?scl_prefix}maven-local
 BuildRequires: %{?scl_prefix}maven-shared
 BuildRequires: %{?scl_prefix}plexus-containers-component-metadata
 BuildRequires: %{?scl_prefix}plexus-containers-component-annotations
@@ -59,6 +59,9 @@ set -e -x
 %doc LICENSE NOTICE
 
 %changelog
+* Mon Feb 08 2016 Michal Srb <msrb@redhat.com> - 2.0-6.13
+- Fix BR on maven-local & co.
+
 * Mon Jan 18 2016 Michal Srb <msrb@redhat.com> - 2.0-6.12
 - Remove dependency on Sonatype Aether
 
